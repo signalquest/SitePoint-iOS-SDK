@@ -1,0 +1,6 @@
+framework module SQSitePoint {
+  umbrella header "SQSitePoint.h"
+  export *
+
+  module * { export * }
+}
