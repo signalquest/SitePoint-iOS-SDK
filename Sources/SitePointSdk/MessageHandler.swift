@@ -38,43 +38,33 @@ public class MessageHandler: NSObject {
     /// ```
     public func parse(data:Data) throws {
         var arr = [UInt8](data)
-        if arr.isEmpty || sizeof_COP_In < arr.count {
+        if arr.isEmpty {
             throw SdkError.unexpected("Bad array length \(arr.count)")
         }
         
-        var messages = SQ_CopProtocol_Parse_Frame(&arr, arr.count)
-        let messageCount = Int(messages.Number_of_SubFrames)
-        let maxMessages = SQ_COP_PROTOCOL_CONFIG_MAX_SUB_FRAMES
-        if messageCount == 0 || maxMessages < messageCount {
-            throw SdkError.unexpected("\(messageCount) subframes not in (0, \(maxMessages)]")
-        }
-
-        for i in 0..<messageCount {
-            let message = reportAtIndex(&messages, Int64(i))
-            if message.Payload == nil {
-                let detail = "Frame \(messages), Number_of_SubFrames \(messages.Number_of_SubFrames), SubFrame_Type \(message.SubFrame_Type), Status \(message.Status), Length \(message.Length)"
-                throw SdkError.unexpected("Missing payload in \(detail)")
-            }
-            
-            if message.Status < SQ_CopProtocol_SUCCESS { // success is 0, negatives are errors
-                let detail = "Frame \(messages), Number_of_SubFrames \(messages.Number_of_SubFrames), SubFrame_Type \(message.SubFrame_Type), Length \(message.Length), Payload \(String(describing: message.Payload))"
-                throw SdkError.withFailureStatus(Int(message.Status), detail)
-            }
-
-            switch Int32(message.SubFrame_Type) {
-                case COP_SF_STATUS_PORTABLE:
-                    let sitePointStatus = Pointer_to_status(message.Payload).pointee
+        var reader = sqtpFrameReaderInitStruct(&arr, arr.count)
+        
+        while (reader.status == SqtpStatus_t.SQTP_STATUS_SUCCESS) {
+            switch reader.subframe.id {
+            case SqtpSubframeId_t.SQTP_ID_SITEPOINT_STATUS:
+                let sitePointStatus = sqspStatusCopy(reader.subframe.payload)
                     delegate?.receive(status: Status(sitePointStatus))
-                case COP_SF_LLA_PORTABLE:
-                    let sitePointLla = Pointer_to_lla(message.Payload).pointee
+            case SqtpSubframeId_t.SQTP_ID_SITEPOINT_LLA:
+                let sitePointLla = sqspLlaCopy(reader.subframe.payload)
                     delegate?.receive(location: Location(sitePointLla))
-                case COP_SF_MODE_PORTABLE:
+            case SqtpSubframeId_t.SQTP_ID_SITEPOINT_LOCAL_BASE_CONFIG:
                     fallthrough
-                case COP_SF_RELPOS_PORTABLE:
+            case SqtpSubframeId_t.SQTP_ID_SITEPOINT_RELPOS:
                     break
                 default:
-                    MessageHandler.logger.debug("Unsupported message type: '\(String(describing: message.SubFrame_Type))'")
+                MessageHandler.logger.debug("Unsupported message type: '\(String(describing: reader.subframe.id))'")
             }
+            reader = sqtpFrameReaderNextStruct(reader)
+        }
+        if (reader.status != SqtpStatus_t.SQTP_STATUS_FRAME_END) {
+            let status_text = String( describing: reader.status )
+            let detail = "\(status_text), frame index \(reader.index), subframe id \(reader.subframe.id), payload length \(reader.subframe.length)"
+            throw SdkError.unexpected("Frame parsing error: \(detail)")
         }
     }
 }
@@ -84,13 +74,27 @@ public enum SdkError: Error {
     case withFailureStatus(Int, String)
 }
 
+fileprivate func isCharging(_ systemPowerState:UInt8) -> Bool {
+  let chargingBit = 6;
+  return (systemPowerState & (1 << chargingBit)) != 0;
+}
+
 public struct ScanStatus {
     /// Whether SitePoint is currently connected to a device.
     public let connected:Bool
+    /// Battery % remaining, 0-100.
+    public let battery:UInt8
+    /// Actively charging?
+    public let charging:Bool
+    /// Number of satellites used to calculate location solution.
+    public let satellites:UInt8
     
     public init(_ advertisementData: NSData) {
-        let rsp = Rsp_from_bytes(advertisementData.bytes)
-        connected = (rsp.mode.flags & 4) == 1
+        let rsp = sqspRspCCopy(advertisementData.bytes)
+        connected = (rsp.mode.connected != 0)
+        battery = rsp.batteryLevel
+        satellites = rsp.satelliteCount
+        charging = isCharging(rsp.systemPowerState)
     }
 }
 
@@ -105,22 +109,26 @@ public struct Status {
     public let satellites:UInt8
     /// Battery % remaining, 0-100.
     public let battery:UInt8
+    /// Actively charging?
+    public let charging:Bool
     /// Whether each of the 8 latest RTCM messages were used.
     public let aidingQuality:[Bool]
     
-    init(_ s:sqgps_status_Portable_t) {
+    
+    init(_ s:SqspStatus_t) {
         iTow = s.iTOW
-        time = s.Time
-        mode = s.mode
+        time = s.time
+        mode = s.solType
         satellites = s.numSV
-        battery = s.RSP.battery_level
-        aidingQuality = Status.getAidingQualityBins(s.RSP.SQ_Status)
+        battery = s.rsp.batteryLevel
+        charging = isCharging(s.rsp.systemPowerState)
+        aidingQuality = Status.getAidingQualityBins(s.rsp.aidingBins)
     }
     
     public init() {
-        self.init(sqgps_status_Portable_t())
+        self.init(SqspStatus_t())
     }
-
+    
     private static func getAidingQualityBins(_ aidingQuality:UInt8) -> [Bool] {
         var out = [Bool]()
         var values:UInt8 = aidingQuality
@@ -134,7 +142,7 @@ public struct Status {
     /// Label for Status.mode.
     public var modeLabel: String {
         get {
-            let modePointer:UnsafeMutablePointer<UInt8>? = MODE_lookup(mode);
+            let modePointer:UnsafePointer<UInt8>? = sqspSolutionTypeLabel(mode);
             if let p = modePointer {
                 return String(cString: p)
             } else {
@@ -158,7 +166,7 @@ public struct Location {
     /// In meters.
     public let verticalAccuracy:Double
     
-    init(_ lla:sqgps_lla_Portable_t) {
+    init(_ lla:SqspLla_t) {
         iTow = lla.iTOW
         latitude = lla.lat
         longitude = lla.lon
@@ -168,6 +176,6 @@ public struct Location {
     }
     
     public init() {
-        self.init(sqgps_lla_Portable_t())
+        self.init(SqspLla_t())
     }
 }
