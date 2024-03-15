@@ -125,17 +125,19 @@ public struct NtripParser {
             return
         }
         
-        if NTRIP_MESSAGE_PENDING == status && NTRIP_RTCM_Message == type {
-            let buffer = poll.Buffer
-            let len = poll.Length
-            let messageType = getRtcmId(buffer, len)
-            if let msgType = messageType, allowedMessageTypes.contains(Int(msgType)) {
-                let a = UnsafeMutableBufferPointer(start: buffer, count: len)
-                rtcmCallback(Data(a))
-                NtripParser.logger.debug("parsed RTCM message with id \(msgType)")
-                NTRIP_Parse_Next_Message(parseContext)
-                handleRtcmResults()
+        if NTRIP_MESSAGE_PENDING == status {
+            if NTRIP_RTCM_Message == type {
+                let buffer = poll.Buffer
+                let len = poll.Length
+                let messageType = getRtcmId(buffer, len)
+                if let msgType = messageType, allowedMessageTypes.contains(Int(msgType)) {
+                    let a = UnsafeMutableBufferPointer(start: buffer, count: len)
+                    rtcmCallback(Data(a))
+                    NtripParser.logger.debug("parsed RTCM message with id \(msgType)")
+                }
             }
+            NTRIP_Parse_Next_Message(parseContext)
+            handleRtcmResults()
         } else if (NTRIP_NO_MESSAGE_PENDING == status) {
             NtripParser.logger.debug("parseRtcm done, no message pending")
         } else {

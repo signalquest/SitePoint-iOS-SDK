@@ -5,8 +5,8 @@ FOUNDATION_EXPORT const unsigned char SQSitePointVersionString[];
 
 #define __iOS__ 1
 
-#import <SQSitePoint/SQ_CopProtocol.h>
-#import <SQSitePoint/SQ_CopProtocol_config.h>
-#import <SQSitePoint/SQCOPSitePoint.h>
-#import <SQSitePoint/CopFWProtocol.h>
+#import <SQSitePoint/sqtpFrame.h>
+#import <SQSitePoint/sqtpSubframeIDs.h>
+#import <SQSitePoint/sqspTypes.h>
+#import <SQSitePoint/sqspTypeWrap.h>
 #import <SQSitePoint/NTRIPBuffer.h>
