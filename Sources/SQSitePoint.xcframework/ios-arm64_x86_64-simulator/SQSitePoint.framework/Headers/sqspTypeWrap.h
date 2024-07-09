@@ -123,7 +123,7 @@ FUNC_ATTR       SqspRspC_t       sqspRspCCopy(              const uint8_t *p );
 FUNC_ATTR       SqspRspC_t       sqspRspCConvertCast(       const uint8_t *p );
 FUNC_ATTR       SqspRspC_t       sqspRspCConvertCopy(       SqspRsp_t rsps );
 	
-#if (defined(SWIGJAVA) || defined(__FFIGEN__) ) // NOTE: __FFIGEN__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"
+#if (defined(SWIGJAVA) || defined(__FFIGENDART__) ) // NOTE: __FFIGENDART__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"
 FUNC_ATTR       SqspRspC_t       sqspRspCCreate(            uint16_t mfgDataId,
                                                             uint8_t  batteryLevel,
                                                             uint8_t  systemPowerState,
@@ -284,7 +284,7 @@ FUNC_ATTR       SqspRsp_t        sqspRspCopy(               const uint8_t *p );
 FUNC_ATTR       SqspRsp_t        sqspRspConvertCast(        const uint8_t *p );
 FUNC_ATTR       SqspRsp_t        sqspRspConvertCopy(        SqspRspC_t rsps );
 
-#ifdef SWIGJAVA
+#if (defined(SWIGJAVA) || defined(__FFIGENDART__) ) // NOTE: __FFIGENDART__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"
 #if 001
 //No bitfields for Power just yet in JAVA
 FUNC_ATTR       SqspRsp_t        sqspRspCreate(             short mfgDataId,

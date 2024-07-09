@@ -6,7 +6,11 @@
 
 #include <iso646.h>
 #include <stdint.h>
-#include <stdlib.h>
+#ifdef __FFIGENDART__
+    // do not include stdlib.h for FFI gen on Apple platforms
+#else
+    #include <stdlib.h>
+#endif
 #include <stdbool.h>
 
 typedef enum	NTRIP_Parse_Return_e
