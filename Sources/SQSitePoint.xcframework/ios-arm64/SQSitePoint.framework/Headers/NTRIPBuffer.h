@@ -2,6 +2,7 @@
 
 #define __STDC_WANT_LIB_EXT1__ 1
 #include <string.h>
+//#include <cstring>
 
 #include <iso646.h>
 #include <stdint.h>
@@ -72,10 +73,22 @@ typedef struct NTRIP_Parse_Poll_s
 }
 NTRIP_Parse_Poll_t;
 
+
+//#define	MAX_SHORT_TEXT_LENGTH	32
+//#define	MAX_DESCRIPTION_TEXT_LENGTH	256
+
 typedef enum Error_Status_e
 {
-	Error_Status_200 = 200,
-	Error_Status_401 = 401,
+//    TODO: Do NOT add 'Error_Status_Unknown' nor 'Error_Status_0' entries into HTTP_Strings[7][3]
+//     without addressing hard coded indexing values in source code. Search 'switch (temp)'.
+    Error_Status_Unknown   = 0, //  This is explicitly defined to make Java happy. Java doesn't like undefined enums, and we can have this value under certain conditions.
+    Error_Status_0   = Error_Status_Unknown,
+    Error_Status_200 = 200,
+// TODO: To add this value we need to also update HTTP_Strings[7][3].
+//       Do NOT add 'Error_Status_400' an entry into HTTP_Strings[7][3] without addressing hard
+//       coded indexing values in source code. Search 'switch (temp)'.
+//    Error_Status_400 = 400,
+    Error_Status_401 = 401,
 	Error_Status_404 = 404,
 	Error_Status_409 = 409,
 	Error_Status_500 = 500,
@@ -84,6 +97,7 @@ typedef enum Error_Status_e
 }
 Error_Status_t;
 
+//TODO: Remember to set defaults in NTRIP_Parse_Init() function;
 typedef struct NTRIP_Header_Info_s
 {
 	Error_Status_t 	Error_Status;
@@ -93,39 +107,66 @@ typedef struct NTRIP_Header_Info_s
 	uint8_t* Short_Text;
 	uint8_t* Description;
 
+#ifdef notSWIGJAVA
+    char* First_HTTP_Reply;
+#else
+    uint8_t* First_HTTP_Reply;
+#endif
 	uint8_t* Authorization;
-	uint8_t* Cache_Control;
-	uint8_t* Connection;
-	uint8_t* Content_Length;
-	uint8_t* Content_Type;
-	uint8_t* Date;
-	uint8_t* First_HTTP_Reply;
-	uint8_t* Host;
-	uint8_t* Server;
-	uint8_t* Pragma;
-	uint8_t* Transfer_Encoding;
-	uint8_t* WWW_Authenticate;
-	uint8_t* Ntrip_Version;
+	uint8_t* Cache_Control;			
+	uint8_t* Connection;			
+	uint8_t* Content_Length;		
+	uint8_t* Content_Type;			
+	uint8_t* Date;					
+	uint8_t* Host;					
+	uint8_t* Server;				
+	uint8_t* Pragma;				
+	uint8_t* Transfer_Encoding;		
+	uint8_t* WWW_Authenticate;		
+	uint8_t* Ntrip_Version;			
 	uint8_t* Ntrip_Flags;
 
-	uint8_t Code_string[64];
+	//	NOTE: Leave all string buffers same length of 64, which ought to be a symbol/enum/define?  TODO: Do this better?
+
+#ifdef SWIGJAVA
+    char Code_string[64];
+    char Short_Text_string[64];
+    char Description_string[64];
+
+    char First_HTTP_Reply_string[64];
+    char Authorization_string[64];		// "Authorization: ",
+    char Cache_Control_string[64];		// "Cache-Control: ",
+    char Connection_string[64];			// "Connection: ",
+    char Content_Length_string[64];		// "Content-Length: ",
+    char Content_Type_string[64];		// "Content-Type: ",
+    char Date_string[64];				// "Date: ",
+    char Host_string[64];				// "Host: ",
+    char Server_string[64];				// "Server: ",
+    char Pragma_string[64];				// "Pragma: ",
+    char Transfer_Encoding_string[64];	// "Transfer-Encoding: ",
+    char WWW_Authenticate_string[64];	// "WWW-Authenticate: ",
+    char Ntrip_Version_string[64];		// "Ntrip-Version: ",
+    char Ntrip_Flags_string[64];		// "Ntrip-Flags: ",
+#else
+    uint8_t Code_string[64];
 	uint8_t Short_Text_string[64];
 	uint8_t Description_string[64];
 
-	uint8_t	Authorization_string[64];      // "Authorization: ",
-	uint8_t	Cache_Control_string[64];      // "Cache-Control: ",
-	uint8_t	Connection_string[64];         // "Connection: ",
-	uint8_t	Content_Length_string[64];     // "Content-Length: ",
-	uint8_t	Content_Type_string[64];       // "Content-Type: ",
-	uint8_t	Date_string[64];               // "Date: ",
-	uint8_t First_HTTP_Reply_string[64];
-	uint8_t	Host_string[64];               // "Host: ",
-	uint8_t	Server_string[64];             // "Server: ",
-	uint8_t	Pragma_string[64];             // "Pragma: ",
-	uint8_t	Transfer_Encoding_string[64];  // "Transfer-Encoding: ",
-	uint8_t	WWW_Authenticate_string[64];   // "WWW-Authenticate: ",
-	uint8_t	Ntrip_Version_string[64];      // "Ntrip-Version: ",
-	uint8_t	Ntrip_Flags_string[64];        // "Ntrip-Flags: ",
+    uint8_t First_HTTP_Reply_string[64];
+	uint8_t	Authorization_string[64];		// "Authorization: ",
+	uint8_t	Cache_Control_string[64];		// "Cache-Control: ",
+	uint8_t	Connection_string[64];			// "Connection: ",
+	uint8_t	Content_Length_string[64];		// "Content-Length: ",
+	uint8_t	Content_Type_string[64];		// "Content-Type: ",
+	uint8_t	Date_string[64];				// "Date: ",
+	uint8_t	Host_string[64];				// "Host: ",
+	uint8_t	Server_string[64];				// "Server: ",
+	uint8_t	Pragma_string[64];				// "Pragma: ",
+	uint8_t	Transfer_Encoding_string[64];	// "Transfer-Encoding: ",
+	uint8_t	WWW_Authenticate_string[64];	// "WWW-Authenticate: ",
+	uint8_t	Ntrip_Version_string[64];		// "Ntrip-Version: ",
+	uint8_t	Ntrip_Flags_string[64];			// "Ntrip-Flags: ",
+#endif
 }
 NTRIP_Header_Info_t;
 
@@ -167,9 +208,10 @@ typedef	struct	NTRIP_Parse_Context_s
 
 	int	ChunkSize;
 
-	bool	chunked;
+//	bool	raw_mode;	//TODO: This is set but not cleared. not guaranteed valid, see note in ntrip.c
+	bool	chunked;	//TODO: Is this set or cleared anywhere?  is it even valid?
 
-	NTRIP_Parse_Return_t	Last_Return_Value;
+	NTRIP_Parse_Return_t	Last_Return_Value;	//DEBUG // NOTE: Mostly for diagnostics/debugging.
 	NTRIP_Version_t			NTRIP_Version;
 
 	NTRIP_Parse_Poll_t	Poll;
@@ -187,8 +229,12 @@ NTRIP_Parse_Context_t;
 #if defined(__iOS__)
 __attribute__((visibility("default"))) __attribute__((used))
 #endif
-NTRIP_Parse_Return_t	NTRIP_Parse_Init(NTRIP_Parse_Context_t *Context, uint8_t *WorkingBuffer, size_t length, NTRIP_Parse_Call_Back_t	*Callback);
 
+#ifdef SWIGJAVA
+NTRIP_Parse_Return_t	NTRIP_Parse_Init(NTRIP_Parse_Context_t *Context, uint8_t *JavaByteArray, size_t length, NTRIP_Parse_Call_Back_t	*Callback); //NOTE: JavaByteArray is an SQ construct
+#else
+NTRIP_Parse_Return_t	NTRIP_Parse_Init(NTRIP_Parse_Context_t *Context, uint8_t *WorkingBuffer, size_t length, NTRIP_Parse_Call_Back_t	*Callback);
+#endif
 
 // Pass a chunk of data into the Ring Buffer for processing, and a Call Back 
 // will be made for each message found.
@@ -197,8 +243,11 @@ NTRIP_Parse_Return_t	NTRIP_Parse_Init(NTRIP_Parse_Context_t *Context, uint8_t *W
 #if defined(__iOS__)
 __attribute__((visibility("default"))) __attribute__((used))
 #endif
+#ifdef SWIGJAVA
+NTRIP_Parse_Return_t	NTRIP_Parse(NTRIP_Parse_Context_t *Context, uint8_t *JavaByteArray, size_t length); //NOTE: JavaByteArray is an SQ construct
+#else
 NTRIP_Parse_Return_t	NTRIP_Parse(NTRIP_Parse_Context_t *Context, uint8_t *Buffer, size_t length);
-
+#endif
 
 // Release_and_Poll API : Release previous message (if any) from 
 // Context->WorkingBuffer, search for another message (if any) 

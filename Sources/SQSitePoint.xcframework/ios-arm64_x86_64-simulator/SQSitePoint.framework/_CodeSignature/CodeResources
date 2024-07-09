@@ -6,35 +6,39 @@
 	<dict>
 		<key>Headers/NTRIPBuffer.h</key>
 		<data>
-		geMeY9JHX24eIVFVhMXmy++c1O4=
+		bkI9vrmWTw94s4gB4pG5a1jYD8A=
 		</data>
 		<key>Headers/SQSitePoint.h</key>
 		<data>
 		ID9yKQB1E0fXCM65h7Vw4v6nAnY=
 		</data>
+		<key>Headers/os_target.h</key>
+		<data>
+		/RbX31ZzGY3Yc4vuzfrhKuBPz7Q=
+		</data>
 		<key>Headers/sqspTypeWrap.h</key>
 		<data>
-		YBs/NSBkNZwIZYA4zQaaFBWvrm0=
+		9OxkUDaWc8lBLhaUEpYacf4vuX4=
 		</data>
 		<key>Headers/sqspTypes.h</key>
 		<data>
-		GmIYJwROojQDfaRmrirUcgBkxXw=
+		u4fhHJLkzFr76MBYUHEP+67Wcj4=
 		</data>
 		<key>Headers/sqtpFrame.h</key>
 		<data>
-		UtxX3ZKeAu+Vy3ii/SqCYDR9Zyw=
+		SOJpxIY91XGqk5HKtTjbW7+bRlc=
 		</data>
 		<key>Headers/sqtpStatus.h</key>
 		<data>
-		y1j3hpSBAaVQBuDgyDZfoZAR4WM=
+		l3XTY3RJNgWLwCkfOIGVl/mkP0c=
 		</data>
 		<key>Headers/sqtpSubframeIDs.h</key>
 		<data>
-		sQWmHOn1WfVEZSBtqy81IOwB9wA=
+		UtzYCWm0J2nooUAKvWscV3l1tD0=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		uO4ZzvnTNo10WXYWkf5FGUNQi0A=
+		1IeFlhYUVhXkL90aMMlQZoHe4ok=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -47,7 +51,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			fdGol9IPmQMPmukgnOc3ramUXFKucoGEDeh3Y/+H4Z0=
+			07NWoYBtzoJiS3Ru2pwxSyE546jvAqC4V3SI720A/Lc=
 			</data>
 		</dict>
 		<key>Headers/SQSitePoint.h</key>
@@ -57,39 +61,46 @@
 			t4pObVzybGEYUpKmCEdwvdBkkDnrmKkLW2X8T+89JxU=
 			</data>
 		</dict>
+		<key>Headers/os_target.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			eIAmUgvPBF4HsAMx/EyH2MxhrUD1QAwF6unkAJtJOtE=
+			</data>
+		</dict>
 		<key>Headers/sqspTypeWrap.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			xjO9IypxxKAAMppo7DCXRzlEH13GkXGXETEGjPKfAe4=
+			+v38pXGsxF2ncFJtKWWETUL2Xk7UELJpTmz7oKAOqCU=
 			</data>
 		</dict>
 		<key>Headers/sqspTypes.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			yeNS/XSzEkO7fF773aoMJSSlXBFE5DLd5yn7k9HNBC0=
+			Na1XvOpb7VV9sJnqAcznrR8Un7VQbXGzRlm4XhH57qU=
 			</data>
 		</dict>
 		<key>Headers/sqtpFrame.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			3mvGCfMoDoCEx7kPGrzjBqn7YkBJiLErhPTfGbFaIBo=
+			8VYLbmepJy42SCFFkKgqgPaU6gc4LHXe3+EtHG94V8k=
 			</data>
 		</dict>
 		<key>Headers/sqtpStatus.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			tqEcRw5RX7tK1kVl2LqhVYY2mS+CP/S8kCIscDxKn0U=
+			QoaRBBFI3cvb/dWlH51cx4COOoD0pRoADoJoo+XAk+s=
 			</data>
 		</dict>
 		<key>Headers/sqtpSubframeIDs.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			cF2q7tDn88NkUUnYNWveB3YlnL8959uDmz4HysdIVqQ=
+			LzCzXEUcZVRxnrYlLbUCJamzS9xUzX1eYV1Gup8ku2A=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
