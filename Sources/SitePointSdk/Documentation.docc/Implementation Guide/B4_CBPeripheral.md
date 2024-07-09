@@ -40,7 +40,7 @@ These characteristics will then be available in the CBPeripheralDelegate's `didD
 
 ### Receiving SitePoint location and status data
 
-To receive the SitePoint's location and status data, the incoming messages on the `messageCharacteristic` are parsed. This is handled in the `didUpdateValueFor` callback, which is called when the characteristic has received data.
+To receive the SitePoint's location and status data, parse the incoming messages from the message characteristic. This is handled in the `didUpdateValueFor` callback, which is called when the characteristic has received data.
 
 The messages are sent to the `MessageHandler` in the SDK, and return structured ``Location`` and ``Status`` data.
 

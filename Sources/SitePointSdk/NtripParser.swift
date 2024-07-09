@@ -6,17 +6,26 @@ public typealias authorizedHandler = (Result<Void, AuthorizationFailure>) -> Voi
 public typealias rtcmHandler = (_ message: Data) -> Void
 
 /// Parses NTRIP authorization and RTCM messages.
-public struct NtripParser {
+public class NtripParser {
     
     /// Creates an NTRIP parser with the passed-in callbacks; the callbacks are necessary because it may take multiple streamed-in chunks to get results, or multiple RTCM messages from one chunk
     /// - Parameters:
     ///   - authorizedCallback: for authorization handling
     ///   - rtcmCallback: for RTCM data handling; data to be passed as-is to a SitePoint
     public init(_ authorizedCallback:@escaping authorizedHandler, _ rtcmCallback:@escaping rtcmHandler) {
-        let ntripErrorCode = NTRIP_Parse_Init(parseContext, &parseBuffer, parseBuffer.count, nil);
+        let parseBufferLen = 32768
+        parseBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: parseBufferLen)
+        parseContext = UnsafeMutablePointer<NTRIP_Parse_Context_t>.allocate(capacity: 1)
+        
+        let ntripErrorCode = NTRIP_Parse_Init(parseContext, parseBuffer, parseBufferLen, nil)
         assert(NTRIP_SUCCESS == ntripErrorCode, "Ntrip parsing init error: \(ntripErrorCode)")
         self.authorizedCallback = authorizedCallback
         self.rtcmCallback = rtcmCallback
+    }
+    
+    deinit {
+        parseBuffer.deallocate()
+        parseContext.deallocate()
     }
     
     /// Parses aiding authorization request for the input stream.
@@ -37,6 +46,7 @@ public struct NtripParser {
         let reason:String = String(cString: header.Short_Text)
         let description:String = String(cString: header.Description)
         let poll = parseContext.pointee.Poll
+
         NtripParser.logger.debug("parseAuthorized \(status): \(reason); status/type: \(poll.Status.rawValue)/\(poll.type.rawValue). From \(String(cString: header.First_HTTP_Reply))")
         let needMoreData = NTRIP_NO_MESSAGE_PENDING.rawValue == parsed.rawValue
         if (!needMoreData) {
@@ -54,11 +64,18 @@ public struct NtripParser {
     /// Call after authorization is established using ``parseAuthorized(_:)`` to start parsing RTCM messages.
     ///
     /// Results (0 or more messages per response) get sent to the ``rtcmHandler``.
-    public func parseRtcm(_ stream: InputStream) {
+    ///
+    /// - Returns: The NTRIP Parse status; anything < 0 is unexpected and should be reported to SignalQuest.
+    public func parseRtcm(_ stream: InputStream) -> Int {
         var bytes = readBytes(stream)
         //NtripParser.logger.trace("parseRtcm w/ \(bytes.map { String(format: "%02hhX", $0)}.joined(separator: " "))")
-        var _ = NTRIP_Parse(parseContext, &bytes, bytes.count)
-        handleRtcmResults()
+        let status = NTRIP_Parse(parseContext, &bytes, bytes.count)
+        if status.rawValue < NTRIP_SUCCESS.rawValue { // 0 is NTRIP_SUCCESS, negative values are errors
+            NtripParser.logger.error("Unexpected parse return '\(String(describing: status))' parsing RTCM bytes ('\(bytes)')")
+        } else {
+            handleRtcmResults()
+        }
+        return Int(status.rawValue)
     }
     
     private static let logger = Logger(
@@ -69,8 +86,8 @@ public struct NtripParser {
     /// Callback for receiving an RTCM message that can be written directly to a SitePoint for aiding.
     private var rtcmCallback:((_ message: Data) -> Void)
     private var authorizedCallback:((Result<Void, AuthorizationFailure>) -> Void)
-    private var parseContext = UnsafeMutablePointer<NTRIP_Parse_Context_t>.allocate(capacity: 1)
-    private var parseBuffer:[UInt8] = Array(repeating: 0, count: 8192)
+    private var parseContext:UnsafeMutablePointer<NTRIP_Parse_Context_t>
+    private var parseBuffer:UnsafeMutablePointer<UInt8>
     
     private var allowedMessageTypes = [ // SitePoint recognizes these
         1001, // L1 - only GPS RTK observables
@@ -133,8 +150,12 @@ public struct NtripParser {
                 if let msgType = messageType, allowedMessageTypes.contains(Int(msgType)) {
                     let a = UnsafeMutableBufferPointer(start: buffer, count: len)
                     rtcmCallback(Data(a))
-                    NtripParser.logger.debug("parsed RTCM message with id \(msgType)")
+                    NtripParser.logger.debug("relayed RTCM message with id \(msgType)")
+                } else {
+                    NtripParser.logger.debug("filtered out RTCM message with id \(String(describing:messageType))")
                 }
+            } else {
+                NtripParser.logger.info("not an RTCM message; type \(type.rawValue)")
             }
             NTRIP_Parse_Next_Message(parseContext)
             handleRtcmResults()
@@ -179,4 +200,3 @@ public struct AuthorizationFailure:Error {
         self.description = description
     }
 }
-

@@ -40,6 +40,8 @@ extern "C" {
 //  Includes
 #include <stdint.h>
 
+#include "os_target.h"
+
 //  Defines
 #define sqtpSubframeIdIsReserved(a) ( ( (a) == SQTP_ID_RESERVED_0000 )  \
                                     ||( (a) == SQTP_ID_RESERVED_FFFF ) )
@@ -83,7 +85,7 @@ typedef enum SqtpSubframeId_e
   //  uBlox-originating Subframe messages ID
   SQTP_ID_UBLOX                                                       = 0x62B5,
 
-} __attribute__((enum_extensibility(closed))) SqtpSubframeId_t;
+} ENUM_ATTR SqtpSubframeId_t;
 
 //  Constants
 

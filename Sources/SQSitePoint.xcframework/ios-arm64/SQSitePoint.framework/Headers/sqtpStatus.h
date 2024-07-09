@@ -1,5 +1,5 @@
 /*******************************************************************************
-**  Copyright 2023 - SignalQuest, Inc.    PROPRIETARY & CONFIDENTIAL
+**  Copyright 2024 - SignalQuest, Inc.    PROPRIETARY & CONFIDENTIAL
 ********************************************************************************
 **
 **  This file is confidential and proprietary property of SignalQuest, Inc.
@@ -22,6 +22,7 @@ extern "C" {
 #endif  //__cplusplus
 
 //  Includes
+#include "os_target.h"
 
 //  Defines
 
@@ -40,7 +41,7 @@ typedef enum SqtpStatus_e
   SQTP_STATUS_SUBFRAME_BAD_LENGTH = -8, //  Invalid subframe length
                                         //  Subframe did not fit in frame
   SQTP_STATUS_SUBFRAME_BAD_CHECK  = -9, //  Subframe check value mismatch
-} __attribute__((enum_extensibility(closed))) SqtpStatus_t;
+} ENUM_ATTR SqtpStatus_t;
 
 //  Constants
 

@@ -11,7 +11,7 @@ public protocol MessageReceiverDelegate {
 
 /// Handles message parsing for data sent and received over characteristics.
 ///
-/// > Note: MessageHandler currently supports the handling of ``Status`` and ``Location`` data received over the ``messageCharacteristic``.
+/// > Note: MessageHandler currently supports the handling of ``Status`` and ``Location`` data.
 /// >
 /// > Future releases will include reading and writing Configuration messages.
 public class MessageHandler: NSObject {
@@ -21,12 +21,9 @@ public class MessageHandler: NSObject {
         category: String(describing: MessageHandler.self)
     )
     
-    /// Reserved for future use. Will be used to write to characteristics.
-    public var messageCharacteristic: CBCharacteristic?
-    
     public var delegate:MessageReceiverDelegate?
     
-    /// Parses ``Status`` and ``Location``  messages from the  results of `CBPeripheralDelegate.didUpdateValue` for the ``messageCharacteristic``.
+    /// Parses ``Status`` and ``Location``  messages from the  results of `CBPeripheralDelegate.didUpdateValue`.
     ///
     /// ### Example
     /// ```swift
@@ -74,11 +71,6 @@ public enum SdkError: Error {
     case withFailureStatus(Int, String)
 }
 
-fileprivate func isCharging(_ systemPowerState:UInt8) -> Bool {
-  let chargingBit = 6;
-  return (systemPowerState & (1 << chargingBit)) != 0;
-}
-
 public struct ScanStatus {
     /// Whether SitePoint is currently connected to a device.
     public let connected:Bool
@@ -94,7 +86,7 @@ public struct ScanStatus {
         connected = (rsp.mode.connected != 0)
         battery = rsp.batteryLevel
         satellites = rsp.satelliteCount
-        charging = isCharging(rsp.systemPowerState)
+        charging = (rsp.Power.Charging != 0)
     }
 }
 
@@ -121,7 +113,7 @@ public struct Status {
         mode = s.solType
         satellites = s.numSV
         battery = s.rsp.batteryLevel
-        charging = isCharging(s.rsp.systemPowerState)
+        charging = (s.rsp.Power.Charging != 0)
         aidingQuality = Status.getAidingQualityBins(s.rsp.aidingBins)
     }
     
