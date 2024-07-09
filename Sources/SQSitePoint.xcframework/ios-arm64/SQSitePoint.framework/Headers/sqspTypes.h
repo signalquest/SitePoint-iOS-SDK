@@ -93,7 +93,7 @@ typedef struct SqspLbConfigC_s
   int8_t        reserved[3];            //  Pad length to a multiple of 4 bytes
 } PACKED_ATTR SqspLbConfigC_t;
 
-#if (defined(SWIGJAVA) || defined(__FFIGEN__) ) // NOTE: __FFIGEN__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"
+#if (defined(SWIGJAVA) || defined(__FFIGENDART__) ) // NOTE: __FFIGENDART__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"
 	// Do not define SqspSystemPowerC_s, SqspSystemPowerC_t
 #else
 //  Compact ("C") structures making use of bitfields.
@@ -110,7 +110,7 @@ typedef struct SqspRspC_s
 {
   uint16_t mfgDataId;                   //  ???
   uint8_t  batteryLevel;                //  Battery level [0-100]
-#if (defined(SWIGJAVA) || defined(__FFIGEN__) )
+#if (defined(SWIGJAVA) || defined(__FFIGENDART__) )
   uint8_t  systemPowerState;            //  (Dis)charge state
 #else
   SqspSystemPowerC_t Power;             //  (Dis)charge state	//TODO: Made permanent in SitePoint/NPG, adjust dependent projects accordingly.  See: defined(POWER_STATE_UPGRADE)
@@ -261,7 +261,7 @@ typedef struct SqLbConfig_s
 } SqspLbConfig_t;
 #endif
 
-#if (defined(SWIGJAVA) || defined(__FFIGEN__) ) // NOTE: __FFIGEN__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"
+#if (defined(SWIGJAVA) || defined(__FFIGENDART__) ) // NOTE: __FFIGENDART__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"
 typedef struct SqspRsp_s
 {
   short    mfgDataId;                   //  ???
@@ -299,7 +299,7 @@ typedef struct SqspRsp_s
 {
   uint16_t mfgDataId;                   //  ???
   uint8_t  batteryLevel;                //  Battery level [0-100]
-#if (defined(SWIGJAVA) || defined(__FFIGEN__) ) // NOTE: __FFIGEN__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"
+#if (defined(SWIGJAVA) || defined(__FFIGENDART__) ) // NOTE: __FFIGENDART__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"
   uint8_t  systemPowerState;            //  (Dis)charge state
 #else
   SqspSystemPowerC_t Power;             //  (Dis)charge state	//TODO: Made permanent in SitePoint/NPG, adjust dependent projects accordingly.  See: defined(POWER_STATE_UPGRADE)
@@ -466,7 +466,7 @@ FUNC_ATTR bool sqspLbConfigExpand(  SqspLbConfig_t  *lbc,
 FUNC_ATTR bool sqspLbConfigCompact( SqspLbConfigC_t *lbc,
   const SqspLbConfig_t  *lbcs );
 
-#if (defined(SWIGJAVA) || defined(__FFIGEN__) ) // NOTE: __FFIGEN__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"
+#if (defined(SWIGJAVA) || defined(__FFIGENDART__) ) // NOTE: __FFIGENDART__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"
 FUNC_ATTR bool sqspRspCInit( SqspRspC_t *rsp,
 	short mfgDataId,
 	char batteryLevel,
@@ -508,7 +508,7 @@ FUNC_ATTR bool sqspRspCInit( SqspRspC_t *rsp,
 	const SqspLbModeC_t *mode);
 #endif
 
-#if (defined(SWIGJAVA) || defined(__FFIGEN__) ) // NOTE: __FFIGEN__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"//No bitfields for SqspSystemPowerC_t Power just yet in JAVA
+#if (defined(SWIGJAVA) || defined(__FFIGENDART__) ) // NOTE: __FFIGENDART__ is defined (or not) in the ffigen.yaml file under "compiler-opts:" as "'-D__FFIGEN__'"//No bitfields for SqspSystemPowerC_t Power just yet in JAVA
 FUNC_ATTR bool sqspRspInit(  SqspRsp_t  *rsp,
 	short mfgDataId,
 	char batteryLevel,

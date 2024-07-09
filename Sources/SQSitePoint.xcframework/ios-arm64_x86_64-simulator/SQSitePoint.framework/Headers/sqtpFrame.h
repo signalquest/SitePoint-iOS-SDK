@@ -207,7 +207,7 @@ FUNC_ATTR SqtpFrameWriter_t sqtpFrameWriterFinalizeStruct(SqtpFrameWriter_t fw )
 
 #ifdef SWIGJAVA
 // SWIGJAVA helper(s):
-int SqspFrameByteArray  (uint8_t *JavaByteArray, int Length,  SqtpFrameWriter_t *FW);
+//Not currently implemented: int SqspFrameByteArray  (uint8_t *JavaByteArray, int Length,  SqtpFrameWriter_t *FW);
 int SqtpCheckValue_tSize(void);
 #endif
 
