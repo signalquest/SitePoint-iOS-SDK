@@ -34,12 +34,17 @@ public class MessageHandler: NSObject {
     /// }
     /// ```
     public func parse(data:Data) throws {
-        var arr = [UInt8](data)
-        if arr.isEmpty {
-            throw SdkError.unexpected("Bad array length \(arr.count)")
+        let byteCount = data.count
+        if data.isEmpty {
+            throw SdkError.unexpected("Bad array length \(byteCount)")
         }
-        
-        var reader = sqtpFrameReaderInitStruct(&arr, arr.count)
+        // defensive copy
+        let arr = UnsafeMutableRawPointer.allocate(byteCount: byteCount, alignment: 8)
+        defer {
+            arr.deallocate()
+        }
+        arr.copyMemory(from: [UInt8](data), byteCount: byteCount)
+        var reader = sqtpFrameReaderInitStruct(arr, byteCount)
         
         while (reader.status == SqtpStatus_t.SQTP_STATUS_SUCCESS) {
             switch reader.subframe.id {
@@ -50,11 +55,12 @@ public class MessageHandler: NSObject {
                 let sitePointLla = sqspLlaCopy(reader.subframe.payload)
                     delegate?.receive(location: Location(sitePointLla))
             case SqtpSubframeId_t.SQTP_ID_SITEPOINT_LOCAL_BASE_CONFIG:
-                    fallthrough
+                fallthrough
             case SqtpSubframeId_t.SQTP_ID_SITEPOINT_RELPOS:
-                    break
-                default:
-                MessageHandler.logger.debug("Unsupported message type: '\(String(describing: reader.subframe.id))'")
+                // not logging expected and unhandled types
+                break
+            default:
+                MessageHandler.logger.warning("Unsupported message type: '\(String(describing: reader.subframe.id))'")
             }
             reader = sqtpFrameReaderNextStruct(reader)
         }
